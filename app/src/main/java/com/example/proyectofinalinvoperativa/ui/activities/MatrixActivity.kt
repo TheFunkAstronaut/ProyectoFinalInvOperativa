@@ -131,17 +131,64 @@ class MatrixActivity : AppCompatActivity() {
     }
 
     private fun cubrirCeros(matriz: Array<Array<Int>>) {
-        // Ejemplo de lógica para cubrir filas y columnas con líneas
-        val filasCubiertas = setOf(0, 2) // Ejemplo: filas a cubrir
-        val columnasCubiertas = setOf(1) // Ejemplo: columnas a cubrir
+        // Encontrar las filas y columnas que cubren los ceros
+        val filasCubiertas = mutableSetOf<Int>()
+        val columnasCubiertas = mutableSetOf<Int>()
+        val totalFilas = matriz.size
+        val totalColumnas = matriz[0].size
 
-        binding.textExplanation.text = "Cubriendo filas: $filasCubiertas y columnas: $columnasCubiertas"
-        marcarFilasYColumnas(matriz, filasCubiertas, columnasCubiertas)
+        // Ejemplo simple: Cubrir cada fila y columna donde haya ceros
+        for (i in matriz.indices) {
+            for (j in matriz[i].indices) {
+                if (matriz[i][j] == 0) {
+                    if (i !in filasCubiertas) filasCubiertas.add(i)
+                    if (j !in columnasCubiertas) columnasCubiertas.add(j)
+                }
+            }
+        }
+
+        // Determinar el número total de líneas necesarias
+        val totalLineas = filasCubiertas.size + columnasCubiertas.size
+        val numeroTrabajadores = totalFilas // Puedes ajustar según el caso
+
+        if (totalLineas <= numeroTrabajadores) {
+            binding.textExplanation.text = "Número de líneas ($totalLineas) es suficiente para cubrir los ceros."
+            marcarFilasYColumnas(matriz, filasCubiertas, columnasCubiertas)
+        } else {
+            binding.textExplanation.text = "Número de líneas ($totalLineas) es mayor que los trabajadores ($numeroTrabajadores). Ajustando matriz..."
+            ajustarMatriz(matriz)
+        }
     }
 
     private fun ajustarMatriz(matriz: Array<Array<Int>>) {
-        // Aquí implementaremos lógica para ajustar la matriz
+        // Encuentra el menor valor que no esté cubierto por ninguna línea
+        val filasCubiertas = mutableSetOf<Int>()
+        val columnasCubiertas = mutableSetOf<Int>()
+
+        val noCubiertos = mutableListOf<Int>()
+        for (i in matriz.indices) {
+            for (j in matriz[i].indices) {
+                if (i !in filasCubiertas && j !in columnasCubiertas) {
+                    noCubiertos.add(matriz[i][j])
+                }
+            }
+        }
+        val minNoCubierto = noCubiertos.minOrNull() ?: 0
+
+        // Ajusta la matriz
+        for (i in matriz.indices) {
+            for (j in matriz[i].indices) {
+                if (i !in filasCubiertas && j !in columnasCubiertas) {
+                    matriz[i][j] -= minNoCubierto
+                } else if (i in filasCubiertas && j in columnasCubiertas) {
+                    matriz[i][j] += minNoCubierto
+                }
+            }
+        }
+
+        actualizarVistaMatriz(matriz)
     }
+
 
     private fun actualizarVistaMatriz(matriz: Array<Array<Int>>) {
         binding.gridLayout.removeAllViews()
@@ -152,7 +199,7 @@ class MatrixActivity : AppCompatActivity() {
                     gravity = Gravity.CENTER
                     setPadding(8, 8, 8, 8) // Añade relleno interno
                     layoutParams = GridLayout.LayoutParams().apply {
-                        width = 150 // Tamaño mínimo
+                        width = 150
                         height = 150
                         setMargins(8, 8, 8, 8) // Márgenes entre elementos
                     }
