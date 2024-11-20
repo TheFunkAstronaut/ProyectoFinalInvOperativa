@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.proyectofinalinvoperativa"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.proyectofinalinvoperativa"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -33,9 +33,17 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
+    //viewmodels
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+
+    implementation (libs.androidx.gridlayout)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
